@@ -1,53 +1,64 @@
 "use strict";
 
 // Charts
-const monthCtx = document.getElementById('monthlySales').getContext('2d');	// Contexto canvas de los meses
-const deptCtx = document.getElementById('deptSales').getContext('2d');	// Contexto canvas de las categorias.
-
-// Seleccionamos la capa para guardar el total de dinero por año.
-const yearlyLabel = document.getElementById('yearlyTotal');
+const canvas = {
+	monthCtx : document.getElementById('monthlySales').getContext('2d'),	// Contexto canvas de los meses
+	deptCtx : document.getElementById('deptSales').getContext('2d')	// Contexto canvas de las categorias.
+};
 
 // Valores del formulario
-const newAmount = document.getElementById('itemAmount');	// Nueva cantidad.
-const newMonth = document.getElementById('monthId');	// Nuevo mes.
+const formValues = {
+	newAmount : document.getElementById('itemAmount').value,	// Nueva cantidad.
+	newMonth : document.getElementById('monthId').value	// Nuevo mes.
+};
 
 // Colecciones para mostrar en gráficos.
-const monthlyLabelsSet = new Set();
-const monthlySalesArray = [];
-
-//! También lo podemos hacer así.
-// const DATA = {
-// 	monthlyLabelsSet : new Set(),
-// 	monthlySalesArray : []
-// };
-
 const monthlySalesMap = new Map();
 
-// Variables
-const monthSales = Array.of(6500, 3250, 4000);
-const monthLabels = Array.of('Octubre','Noviembre','Diciembre');
+// Variables.
+const data = {
+	deptLabels : ["Cámara", "Móvil", "Portátil", "Tablet"],
+	yearlyLabel : document.getElementById("yearlyTotal")
+};
 
-const deptSales = Array.of(12, 9, 7, 3);
-const deptLabels = Array.of('Cámara', 'Móvil', 'Portátil', 'Tablet');
-
-let yearlyTotal = 0;
+// Botones.
+const buttons = {
+	addSaleBtn: document.getElementById("add-sale"),
+	findOver5000Btn: document.getElementById("find-over-5000"),
+	resetChartBtn: document.getElementById("reset-chart"),
+	showSalesBtn: document.getElementById("display-sales"),
+	deleteSaleBtn: document.getElementById("delete-sale"),
+};
 
 // Gráfico de barras.
-let monthlySalesChart = new Chart(monthCtx, {
+const monthlySalesChart = new Chart(canvas.monthCtx, {
 	type: "bar",
 	data: {
-		labels: deptLabels,
-		datasets: [
-			{
-				label: "Número de ventas",
+		labels: Array.from(monthlySalesMap.keys()),
+		datasets: [{
+				label: 'Cámaras',
 				data: [],
-				backgroundColor: [
-					"rgba(238, 184, 104, 1)",
-					"rgba(75, 166, 223, 1)",
-					"rgba(239, 118, 122, 1)",
-				],
-				borderWidth: 0,
+				backgroundColor: 'rgba(238, 184, 104, 1)',
+				borderWidth: 0
 			},
+			{
+				label: 'Portátiles',
+				data: [],
+				backgroundColor: 'rgba(75, 166, 223, 1)',
+				borderWidth: 0
+			},
+			{
+				label: 'Teléfonos',
+				data: [],
+				backgroundColor: 'rgba(239, 118, 122, 1)',
+				borderWidth: 0
+			},		   
+			{
+				label: "Tablets",
+				data: [],
+				backgroundColor: 'rgba(40, 167, 69, 1)',
+				borderWidth: 0
+			}
 		],
 	},
 	options: {
@@ -64,9 +75,10 @@ let monthlySalesChart = new Chart(monthCtx, {
 });
 
 // Gráfico de sectores.
-let deptSalesChart = new Chart(deptCtx, {
-	type: "pie",?
-	
+const deptSalesChart = new Chart(canvas.deptCtx, {
+	type: "pie",
+	data: {
+		labels: deptLabels,
 		datasets: [
 			{
 				label: "Número de ventas",
@@ -83,12 +95,6 @@ let deptSalesChart = new Chart(deptCtx, {
 	},
 	options: {},
 });
-
-// * CÁLCULO DE TOTALES CON SPREAD OPERATOR.
-
-function addYearlyTotal(a, b, c) {
-	return a + b + c;
-}
 
 // * ENCONTRAR VENTAS SUPERIORES A 5000€ CON FIND()
 
@@ -110,7 +116,7 @@ function findOver5000() {
 // * MEJORA DEL CÁLCULO DE TOTALES.
 
 function initMonthlyTotalSales() {
-	yearlyLabel.innerHTML =
+	data.yearlyLabel.innerHTML =
 	// Se transforma a un array los valores del mapa y ya ahí utilizamos reduce.
 		Array.from(monthlySalesMap.values()).reduce(function(count, value) {
 			return count + value;
@@ -124,32 +130,28 @@ function resetMonthlySales() {
 	monthlySalesMap.clear();
 
 	// Limpiamos los datos del gráfico.
-	// monthlySalesChart.data.datasets[0].data = [];
 	monthlySalesChart.data.labels = [];
 
 	// Actualizamos el gráfico con el método update del framework.
 	monthlySalesChart.update();
-	// También se puede hacer con los métodos de Chart
 	monthlySalesChart.reset();
 	monthlySalesChart.render();
 
+	// Volvemos a calcular los totales.
 	initMonthlyTotalSales();
 }
 
 // * AÑADIR VENTAS AL GRÁFICO.
 
 function cleanAddSaleForm() {
-	newMonth.value = "";
-	newAmount.value = "";
+	formValues.newMonth.value = "";
+	formValues.newAmount.value = "";
 }
 
 function addSale() {
-	const newProduct = document.querySelector('#exampleModal input[name="inlineRadioOptions"]:checked');
-
-	console.log('newProduct: ', newProduct);
 	try {
 		// En el caso de que ya esté el mes en el conjunto.
-		if(monthlySalesMap.has(newMonth.value))
+		if(monthlySalesMap.has(formValues.newMonth))
 			// Lanzamos una excepción.
 			throw {
 				name: "MonthError",
@@ -157,14 +159,13 @@ function addSale() {
 			};
 
 		// Lo pasamos a string ya que todo lo que recoge js de los imputs del DOM son strings.
-		monthlySalesMap.set(newMonth.value, Number.parseInt(newAmount.value));
+		monthlySalesMap.set(formValues.newMonth, +formValues.newAmount);
+
 		// Recuento de totales
 		initMonthlyTotalSales();
 
 		// Actualizar gráfico
 		monthlySalesChart.data.datasets[0].data = Array.from(monthlySalesMap.values());
-		// Con spread operator
-		// [...monthlySalesMap.values()];
 
 		// Cómo el gráfico espera un array creamos un array del conjunto.
 		monthlySalesChart.data.labels = Array.from(monthlySalesMap.keys());
@@ -214,3 +215,11 @@ function removeMonthlySale() {
 	initMonthlyTotalSales();
 	drawSelectMontlySales();
 }
+
+// * EVENT LISTENERS.
+
+buttons.addSaleBtn.addEventListener("click", addSale);
+buttons.findOver5000Btn.addEventListener("click", findOver5000);
+buttons.resetChartBtn.addEventListener("click", resetMonthlySales);
+buttons.showSalesBtn.addEventListener("click", drawSelectMontlySales);
+buttons.deleteSaleBtn.addEventListener("click", removeMonthlySale);

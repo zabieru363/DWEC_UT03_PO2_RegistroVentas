@@ -117,13 +117,13 @@
 				<button type="button" class="btn" data-toggle="modal"
 					data-target="#exampleModal"><span class="oi oi-plus pr-2"></span>Añadir venta
 				</button>
-				<button type="button" class="btn" onClick="findOver5000()">
+				<button type="button" class="btn" id="find-over-5000">
 					<i class="fas fa-search-plus p-2"></i>Ventas > 1000
 				</button>
-				<button type="button" class="btn" onClick="resetMonthlySales()">
+				<button type="button" class="btn" id="reset-chart">
 					<i class="fas fa-redo p-2"></i>Resetear
 				</button>
-				<button type="button" class="btn" onClick="drawSelectMontlySales()" data-toggle="modal"data-target="#deleteModal">
+				<button type="button" class="btn"  data-toggle="modal"data-target="#deleteModal">
 					<i class="fas fa-plus p-2"></i>Eliminar venta
 				</button>
 			</div>
@@ -185,7 +185,7 @@
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-							<button type="button" onclick="addSale()" class="btn">Añadir venta</button>
+							<button type="button" id="add-sale" class="btn">Añadir venta</button>
 						</div>
 					</div>
 				</div>
@@ -238,7 +238,7 @@
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-							<button type="button" class="btn" onclick="removeMonthlySale()">Eliminar venta</button>
+							<button type="button" class="btn" id="delete-sale">Eliminar venta</button>
 						</div>
 					</div>
 				</div>
