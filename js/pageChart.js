@@ -8,15 +8,24 @@ const canvas = {
 
 // Valores del formulario
 const formValues = {
-	newAmount : document.getElementById('itemAmount').value,	// Nueva cantidad.
-	newMonth : document.getElementById('monthId').value	// Nuevo mes.
+	newAmount : document.getElementById('itemAmount'),	// Nueva cantidad.
+	newMonth : document.getElementById('monthId'),	// Nuevo mes.
+	categories : document.forms[0].inlineRadioOptions	// RadioButtons con las categorias de producto.
 };
 
 // Colecciones para mostrar en gráficos.
-const monthlySalesMap = new Map();
+const collections =  {
+	monthlySalesMap : new Map(),
+	monthlySalesCamera : new Map(),	// Colección para almacenar las ventas de cámaras.
+	monthlySalesPhone : new Map(),	// Colección para almacenar las ventas de teléfonos.
+	monthlySalesLaptop : new Map(),	// Colección para almacenar las ventas de portátiles.
+	monthlySalesTablet : new Map(),	// Colección para almacenar las ventas de tablet.
+	// Colección para almacenar el total de cada venta. La clave es la categoria de producto y el valor las ventas totales de ese producto.
+	totalSales : new Map([["camera", 0], ["phone", 0], ["laptop", 0], ["tablet", 0]])	// De momento todas tienen un valor inicial de 0.
+};
 
 // Variables.
-const data = {
+const chartValues = {
 	deptLabels : ["Cámara", "Móvil", "Portátil", "Tablet"],
 	yearlyLabel : document.getElementById("yearlyTotal")
 };
@@ -34,21 +43,21 @@ const buttons = {
 const monthlySalesChart = new Chart(canvas.monthCtx, {
 	type: "bar",
 	data: {
-		labels: Array.from(monthlySalesMap.keys()),
+		labels: Array.from(collections.monthlySalesMap.keys()),
 		datasets: [{
-				label: 'Cámaras',
+				label: "Cámaras",
 				data: [],
 				backgroundColor: 'rgba(238, 184, 104, 1)',
 				borderWidth: 0
 			},
 			{
-				label: 'Portátiles',
+				label: "Móviles",
 				data: [],
 				backgroundColor: 'rgba(75, 166, 223, 1)',
 				borderWidth: 0
 			},
 			{
-				label: 'Teléfonos',
+				label: "Portátiles",
 				data: [],
 				backgroundColor: 'rgba(239, 118, 122, 1)',
 				borderWidth: 0
@@ -78,11 +87,11 @@ const monthlySalesChart = new Chart(canvas.monthCtx, {
 const deptSalesChart = new Chart(canvas.deptCtx, {
 	type: "pie",
 	data: {
-		labels: deptLabels,
+		labels: chartValues.deptLabels,
 		datasets: [
 			{
 				label: "Número de ventas",
-				data: deptSales,
+				data: [...collections.totalSales.values()],
 				backgroundColor: [
 					"rgba(238, 184, 104, 1)",
 					"rgba(75, 166, 223, 1)",
@@ -118,7 +127,7 @@ function findOver5000() {
 function initMonthlyTotalSales() {
 	data.yearlyLabel.innerHTML =
 	// Se transforma a un array los valores del mapa y ya ahí utilizamos reduce.
-		Array.from(monthlySalesMap.values()).reduce(function(count, value) {
+		Array.from(collections.monthlySalesMap.values()).reduce(function(count, value) {
 			return count + value;
 		}, 0) + "€";
 }
@@ -127,7 +136,7 @@ function initMonthlyTotalSales() {
 
 function resetMonthlySales() {
 	// Limpiamos el mapa.
-	monthlySalesMap.clear();
+	collections.monthlySalesMap.clear();
 
 	// Limpiamos los datos del gráfico.
 	monthlySalesChart.data.labels = [];
@@ -151,7 +160,7 @@ function cleanAddSaleForm() {
 function addSale() {
 	try {
 		// En el caso de que ya esté el mes en el conjunto.
-		if(monthlySalesMap.has(formValues.newMonth))
+		if(collections.monthlySalesMap.has(formValues.newMonth))
 			// Lanzamos una excepción.
 			throw {
 				name: "MonthError",
@@ -159,16 +168,16 @@ function addSale() {
 			};
 
 		// Lo pasamos a string ya que todo lo que recoge js de los imputs del DOM son strings.
-		monthlySalesMap.set(formValues.newMonth, +formValues.newAmount);
+		collections.monthlySalesMap.set(formValues.newMonth.value, +formValues.newAmount.value);
 
 		// Recuento de totales
 		initMonthlyTotalSales();
 
 		// Actualizar gráfico
-		monthlySalesChart.data.datasets[0].data = Array.from(monthlySalesMap.values());
+		monthlySalesChart.data.datasets[0].data = Array.from(collections.monthlySalesMap.values());
 
 		// Cómo el gráfico espera un array creamos un array del conjunto.
-		monthlySalesChart.data.labels = Array.from(monthlySalesMap.keys());
+		monthlySalesChart.data.labels = Array.from(collections.monthlySalesMap.keys());
 		monthlySalesChart.update();
 	} catch (error) {
 		// Tratamiento de excepciones
@@ -185,7 +194,7 @@ function drawSelectMontlySales() {
 	// Eliminamos options del select.
 	removeSales.empty();
 
-	for(let [month, amount] of monthlySalesMap.entries()) {
+	for(let [month, amount] of collections.monthlySalesMap.entries()) {
 		// Creamos elemento option con jQuery
 		let opt = $("<option>")
 			.val(month)	// El valor es el mes.
@@ -200,14 +209,14 @@ function removeMonthlySale() {
 	let removeSales = document.getElementById("removeSales");
 
 	// Borramos de la colección la venta.
-	monthlySalesMap.delete(removeSales.value);
+	collections.monthlySalesMap.delete(removeSales.value);
 
 	// Actualizamos colección en el gráfico
 
 	// Sus valores.
-	monthlySalesChart.data.datasets[0].data = Array.from(monthlySalesMap.values());
+	monthlySalesChart.data.datasets[0].data = Array.from(collections.monthlySalesMap.values());
 	// Y sus claves.
-	monthlySalesChart.data.labels = Array.from(monthlySalesMap.keys());
+	monthlySalesChart.data.labels = Array.from(collections.monthlySalesMap.keys());
 	// Y actualizamos el gráfico.
 	monthlySalesChart.update();
 
