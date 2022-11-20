@@ -221,6 +221,28 @@ function addProductToMap() {
 	}
 }
 
+
+function checkFields() {
+	if(formValues.newMonth.value === ""
+	|| formValues.newAmount.value === ""
+	|| formValues.categories.value === "") {
+		throw {
+			name : "FormError",
+			message : "Algunos campos están vacios."
+		};
+	}
+}
+
+function isValidAMount() {
+	if(formValues.newAmount.value < 0
+	|| !/\d+/.test(formValues.newAmount.value)) {	// Comprobamos también si el campo contiene números.
+		throw {
+			name : "InvalidValue",
+			message : "Valor para la cantidad inválido."
+		};
+	}
+}
+
 function addSale() {
 	
 }
