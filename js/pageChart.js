@@ -109,15 +109,15 @@ function findOver5000() {
 	let position = -1;
 
 	// Guarda el primer elemento que coincida con la condición de la función.
-	let quantity = monthSales.find(function (elem, index) {
-		if (elem > 5000) {
+	const quantity = [...collections.totalSales.values()].find(function (sale, index) {
+		if (sale > 5000) {
 			position = index;
 			return true;
 		}
 		return false;
 	});
 
-	alert("Cantidad: " + quantity + " Posición: " + position);
+	alert(!quantity ? "No hay ventas superiores a 5000€" : "Cantidad: " + quantity + "€" +  " Posición: " + position);
 }
 
 // * CÁLCULO DE TOTALES.
@@ -159,8 +159,6 @@ function resetMonthlySales() {
 	// Volvemos a calcular los totales.
 	initMonthlyTotalSales();
 }
-
-// * AÑADIR VENTAS AL GRÁFICO.
 
 function cleanAddSaleForm() {
 	formValues.newMonth.value = "";
