@@ -155,37 +155,74 @@ function resetMonthlySales() {
 function cleanAddSaleForm() {
 	formValues.newMonth.value = "";
 	formValues.newAmount.value = "";
+	formValues.categories.value = "";
+}
+
+/**
+ * Función que suma una cantidad existente + la
+ * cantidad que reciba del formulario. Después
+ * de sumarselo lo mete al map correspondiente.
+ * @param {*} map El mapa a la categoría de productos correspondiente.
+ * @param {*} key La clave a buscar en ese mapa.
+ */
+function getTotalAmount(map, month) {
+	let total = map.get(month);
+	total += +formValues.newAmount.value;	// Le sumamos la cantidad actual + la nueva.
+	map.set(month, total);
+}
+
+function addProductToMap() {
+	// Agrega el producto según el valor que recibe al map correspondiente.
+	switch(formValues.categories.value) {	// Para cada caso tenemos que hacer lo siguiente.
+		case "camera":
+			if(collections.monthlySalesCamera.has(formValues.categories.value)) {	// Si el producto ya está añadido.
+				// Hay que hacer sumarle la cantidad que ya tenía + la nueva.
+				getTotalAmount(collections.monthlySalesCamera, formValues.newMonth.value);
+			} else {	// En caso contrario...
+				/* Lo que tenemos que hacer es registrarlo en el mapa correspondiente. Su clave
+				será el mes introducido por el formulario y si valor la cantidad de ese producto. */
+				collections.monthlySalesCamera.set(formValues.newMonth.value, +formValues.newAmount.value);
+				// También hay que tener en cuenta que el resto de productos puede ser que no tengan ventas.
+				collections.monthlySalesPhone.set(newMonth.value, 0);
+				collections.monthlySalesLaptop.set(newMonth.value, 0);
+				collections.monthlySalesTablet.set(newMonth.value, 0);
+			}
+			break;
+		case "phone":
+			if(collections.monthlySalesPhone.has(formValues.categories.value)) {
+				getTotalAmount(collections.monthlySalesPhone, formValues.newMonth.value);
+			} else {
+				collections.monthlySalesPhone.set(formValues.newMonth.value, +formValues.newAmount.value);
+				collections.monthlySalesCamera.set(newMonth.value, 0);
+				collections.monthlySalesLaptop.set(newMonth.value, 0);
+				collections.monthlySalesTablet.set(newMonth.value, 0);
+			}
+			break;
+		case "laptop":
+			if(collections.monthlySalesLaptop.has(formValues.categories.value)) {
+				getTotalAmount(collections.monthlySalesLaptop, formValues.newMonth.value);
+			} else {
+				collections.monthlySalesLaptop.set(formValues.newMonth.value, +formValues.newAmount.value);
+				collections.monthlySalesCamera.set(newMonth.value, 0);
+				collections.monthlySalesPhone.set(newMonth.value, 0);
+				collections.monthlySalesTablet.set(newMonth.value, 0);
+			}
+			break;
+		case "tablet":
+			if(collections.monthlySalesTablet.has(formValues.categories.value)) {
+				getTotalAmount(collections.monthlySalesTablet, formValues.newMonth.value);
+			} else {
+				collections.monthlySalesTablet.set(formValues.newMonth.value, +formValues.newAmount.value);
+				collections.monthlySalesCamera.set(newMonth.value, 0);
+				collections.monthlySalesPhone.set(newMonth.value, 0);
+				collections.monthlySalesLaptop.set(newMonth.value, 0);
+			}
+			break;
+	}
 }
 
 function addSale() {
-	try {
-		// En el caso de que ya esté el mes en el conjunto.
-		if(collections.monthlySalesMap.has(formValues.newMonth))
-			// Lanzamos una excepción.
-			throw {
-				name: "MonthError",
-				message: "El mes ya está incluido en la gráfica.",
-			};
-
-		// Lo pasamos a string ya que todo lo que recoge js de los imputs del DOM son strings.
-		collections.monthlySalesMap.set(formValues.newMonth.value, +formValues.newAmount.value);
-
-		// Recuento de totales
-		initMonthlyTotalSales();
-
-		// Actualizar gráfico
-		monthlySalesChart.data.datasets[0].data = Array.from(collections.monthlySalesMap.values());
-
-		// Cómo el gráfico espera un array creamos un array del conjunto.
-		monthlySalesChart.data.labels = Array.from(collections.monthlySalesMap.keys());
-		monthlySalesChart.update();
-	} catch (error) {
-		// Tratamiento de excepciones
-		alert(error.message);
-	} finally {
-		// Limpiamos el formulario independientemente de que se haya añadido la venta o no.
-		cleanAddSaleForm();
-	}
+	
 }
 
 function drawSelectMontlySales() {
