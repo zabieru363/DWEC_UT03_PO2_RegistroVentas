@@ -10,7 +10,8 @@ const canvas = {
 const formValues = {
 	newAmount : document.getElementById('itemAmount'),	// Nueva cantidad.
 	newMonth : document.getElementById('monthId'),	// Nuevo mes.
-	categories : document.forms[0].inlineRadioOptions	// RadioButtons con las categorias de producto.
+	categories : document.forms[0].inlineRadioOptions,	// RadioButtons con las categorias de producto.
+	months : ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]	// Array con los meses para cargar en el select de eliminar ventas.
 };
 
 // Colecciones para mostrar en gráficos.
@@ -27,7 +28,8 @@ const collections =  {
 // Variables.
 const chartValues = {
 	deptLabels : ["Cámaras", "Móviles", "Portátiles", "Tablets"],	// Labels para el gráfico de sectores.
-	yearlyLabel : document.getElementById("yearlyTotal")	// Muestra el total de ventas anuales.
+	yearlyLabel : document.getElementById("yearlyTotal"),	// Muestra el total de ventas anuales.
+	monthsKey : ["2022-01", "2022-02", "2022-03", "2022-04", "2022-05", "2022-06", "2022-07", "2022-08", "2022-09", "2022-10", "2022-11", "2022-12"]
 };
 
 // Botones.
@@ -356,25 +358,29 @@ function addSale() {
 
 function drawSelectMontlySales() {
 	// Seleccionamos el select usando id con jQuery
-	let removeSales = $("#removeSales");
+	const removeSalesSelect = $("#removeSales");
 	// Eliminamos options del select.
-	removeSales.empty();
+	removeSalesSelect.empty();
 
-	for(let [month, amount] of collections.monthlySalesMap.entries()) {
-		// Creamos elemento option con jQuery
-		let opt = $("<option>")
-			.val(month)	// El valor es el mes.
-			.text(month + ": " + amount);	// Y el texto el mes + la cantidad.
+	let index = 0;	// Necesitamos esta variable para ir asignando las claves de los meses a los options del select.
 
-			// Añadimos elemento al select.
-		removeSales.append(opt);
+	for(const month of formValues.months) {
+		const option = $("<option>")
+			.val(chartValues.monthsKey[index])	// El valor serán las claves de los meses que se guardan en los mapas.
+			.text(month);	// Y el texto será el nombre del mes.
+		removeSalesSelect.append(option);	// Añadimos los options al select.
+		index++;
 	}
 }
 
 function removeMonthlySale() {
-	let removeSales = document.getElementById("removeSales");
+	const removeSalesSelect = document.getElementById("removeSales");
+	const categories = document.forms[1].inlineRadioOptions;
 
-	// Borramos de la colección la venta.
+	// Borramos la venta de la colección.
+	switch(categories.value) {
+		
+	}
 	collections.monthlySalesMap.delete(removeSales.value);
 
 	// Actualizamos colección en el gráfico
