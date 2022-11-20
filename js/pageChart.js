@@ -123,11 +123,14 @@ function findOver5000() {
 // * CÁLCULO DE TOTALES.
 
 function initMonthlyTotalSales() {
-	chartValues.yearlyLabel.innerHTML =
-	// Se transforma a un array los valores del mapa y ya ahí utilizamos reduce.
-		Array.from(collections.monthlySalesMap.values()).reduce(function(count, value) {
-			return count + value;
-		}, 0) + "€";
+	// Reducimos todas las ventas a un único valor.
+	const total = [...collections.monthlySalesMap.values()].reduce(function(count, value) {
+		return count + value;
+	}, 0);
+
+	const result = !total ? "Sin ventas" : total + "€";
+
+	chartValues.yearlyLabel.innerHTML = result;
 }
 
 // * REINICIAR LOS GRAFICOS.
@@ -287,7 +290,7 @@ function addSale() {
 		initMonthlyTotalSales();
 
 		// Para que aparezcan agrupados por meses.
-		monthlySalesChart.data.labels = Array.from(collections.monthlySalesMap.keys());
+		monthlySalesChart.data.labels = [...collections.monthlySalesMap.keys()];
 
 		// Actualizamos el gráfico de barras.
 		updateBarChart();
