@@ -43,28 +43,28 @@ const buttons = {
 const monthlySalesChart = new Chart(canvas.monthCtx, {
 	type: "bar",
 	data: {
-		labels: Array.from(collections.monthlySalesMap.keys()),
+		labels: [...collections.monthlySalesMap.keys()],
 		datasets: [{
 				label: "Cámaras",
-				data: [],
+				data: [...collections.monthlySalesCamera.values()],
 				backgroundColor: 'rgba(238, 184, 104, 1)',
 				borderWidth: 0
 			},
 			{
 				label: "Móviles",
-				data: [],
+				data: [...collections.monthlySalesPhone.values()],
 				backgroundColor: 'rgba(75, 166, 223, 1)',
 				borderWidth: 0
 			},
 			{
 				label: "Portátiles",
-				data: [],
+				data: [...collections.monthlySalesLaptop.values()],
 				backgroundColor: 'rgba(239, 118, 122, 1)',
 				borderWidth: 0
 			},		   
 			{
 				label: "Tablets",
-				data: [],
+				data: [...collections.monthlySalesTablet.values()],
 				backgroundColor: 'rgba(40, 167, 69, 1)',
 				borderWidth: 0
 			}
@@ -125,7 +125,7 @@ function findOver5000() {
 // * MEJORA DEL CÁLCULO DE TOTALES.
 
 function initMonthlyTotalSales() {
-	data.yearlyLabel.innerHTML =
+	chartValues.yearlyLabel.innerHTML =
 	// Se transforma a un array los valores del mapa y ya ahí utilizamos reduce.
 		Array.from(collections.monthlySalesMap.values()).reduce(function(count, value) {
 			return count + value;
@@ -175,7 +175,7 @@ function addProductToMap() {
 	// Agrega el producto según el valor que recibe al map correspondiente.
 	switch(formValues.categories.value) {	// Para cada caso tenemos que hacer lo siguiente.
 		case "camera":
-			if(collections.monthlySalesCamera.has(formValues.categories.value)) {	// Si el producto ya está añadido.
+			if(collections.monthlySalesCamera.has(formValues.newMonth.value)) {	// Si el producto ya está añadido.
 				// Hay que hacer sumarle la cantidad que ya tenía + la nueva.
 				getTotalAmount(collections.monthlySalesCamera, formValues.newMonth.value);
 			} else {	// En caso contrario...
@@ -183,39 +183,39 @@ function addProductToMap() {
 				será el mes introducido por el formulario y si valor la cantidad de ese producto. */
 				collections.monthlySalesCamera.set(formValues.newMonth.value, +formValues.newAmount.value);
 				// También hay que tener en cuenta que el resto de productos puede ser que no tengan ventas.
-				collections.monthlySalesPhone.set(newMonth.value, 0);
-				collections.monthlySalesLaptop.set(newMonth.value, 0);
-				collections.monthlySalesTablet.set(newMonth.value, 0);
+				collections.monthlySalesPhone.set(formValues.newMonth.value, "");
+				collections.monthlySalesLaptop.set(formValues.newMonth.value, "");
+				collections.monthlySalesTablet.set(formValues.newMonth.value, "");
 			}
 			break;
 		case "phone":
-			if(collections.monthlySalesPhone.has(formValues.categories.value)) {
+			if(collections.monthlySalesPhone.has(formValues.newMonth.value)) {
 				getTotalAmount(collections.monthlySalesPhone, formValues.newMonth.value);
 			} else {
+				collections.monthlySalesCamera.set(formValues.newMonth.value, "");
 				collections.monthlySalesPhone.set(formValues.newMonth.value, +formValues.newAmount.value);
-				collections.monthlySalesCamera.set(newMonth.value, 0);
-				collections.monthlySalesLaptop.set(newMonth.value, 0);
-				collections.monthlySalesTablet.set(newMonth.value, 0);
+				collections.monthlySalesLaptop.set(formValues.newMonth.value, "");
+				collections.monthlySalesTablet.set(formValues.newMonth.value, "");
 			}
 			break;
 		case "laptop":
-			if(collections.monthlySalesLaptop.has(formValues.categories.value)) {
+			if(collections.monthlySalesLaptop.has(formValues.newMonth.value)) {
 				getTotalAmount(collections.monthlySalesLaptop, formValues.newMonth.value);
 			} else {
+				collections.monthlySalesCamera.set(formValues.newMonth.value, "");
+				collections.monthlySalesPhone.set(formValues.newMonth.value, "");
 				collections.monthlySalesLaptop.set(formValues.newMonth.value, +formValues.newAmount.value);
-				collections.monthlySalesCamera.set(newMonth.value, 0);
-				collections.monthlySalesPhone.set(newMonth.value, 0);
-				collections.monthlySalesTablet.set(newMonth.value, 0);
+				collections.monthlySalesTablet.set(formValues.newMonth.value, "");
 			}
 			break;
 		case "tablet":
-			if(collections.monthlySalesTablet.has(formValues.categories.value)) {
+			if(collections.monthlySalesTablet.has(formValues.newMonth.value)) {
 				getTotalAmount(collections.monthlySalesTablet, formValues.newMonth.value);
 			} else {
+				collections.monthlySalesCamera.set(formValues.newMonth.value, "");
+				collections.monthlySalesPhone.set(formValues.newMonth.value, "");
+				collections.monthlySalesLaptop.set(formValues.newMonth.value, "");
 				collections.monthlySalesTablet.set(formValues.newMonth.value, +formValues.newAmount.value);
-				collections.monthlySalesCamera.set(newMonth.value, 0);
-				collections.monthlySalesPhone.set(newMonth.value, 0);
-				collections.monthlySalesLaptop.set(newMonth.value, 0);
 			}
 			break;
 	}
@@ -270,10 +270,14 @@ function addSale() {
 
 		// Finalmente actualizamos el gráfico de barras.
 		updateBarChart();
+		monthlySalesChart.update();
+		monthlySalesChart.render();
 
 	} catch(error) {
 		if(error.name === "FormError") alert(error.name + ": " + error.message);
 		if(error.name === "InvalidValue") alert(error.name + ": " + error.message);
+	} finally {
+		cleanAddSaleForm();
 	}
 }
 
