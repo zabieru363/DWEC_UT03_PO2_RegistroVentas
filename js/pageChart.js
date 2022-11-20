@@ -26,7 +26,7 @@ const collections =  {
 
 // Variables.
 const chartValues = {
-	deptLabels : ["Cámara", "Móvil", "Portátil", "Tablet"],
+	deptLabels : ["Cámaras", "Móviles", "Portátiles", "Tablets"],
 	yearlyLabel : document.getElementById("yearlyTotal")
 };
 
@@ -175,10 +175,12 @@ function addProductToMap() {
 	// Agrega el producto según el valor que recibe al map correspondiente.
 	switch(formValues.categories.value) {	// Para cada caso tenemos que hacer lo siguiente.
 		case "camera":
-			if(collections.monthlySalesCamera.has(formValues.newMonth.value)) {	// Si el producto ya está añadido.
+			if(collections.monthlySalesCamera.has(formValues.newMonth.value)) {
+				// Si el producto ya está añadido.
 				// Hay que hacer sumarle la cantidad que ya tenía + la nueva.
-				getTotalAmount(collections.monthlySalesCamera, formValues.newMonth.value);
-			} else {	// En caso contrario...
+				getTotalAmount(collections.monthlySalesCamera,formValues.newMonth.value);
+			} else {
+				// En caso contrario...
 				/* Lo que tenemos que hacer es registrarlo en el mapa correspondiente. Su clave
 				será el mes introducido por el formulario y si valor la cantidad de ese producto. */
 				collections.monthlySalesCamera.set(formValues.newMonth.value, +formValues.newAmount.value);
@@ -187,9 +189,12 @@ function addProductToMap() {
 				collections.monthlySalesLaptop.set(formValues.newMonth.value, "");
 				collections.monthlySalesTablet.set(formValues.newMonth.value, "");
 			}
+
+			// Calculamos las ventas totales del producto.
+			getTotalAmount(collections.totalSales, "camera");
 			break;
 		case "phone":
-			if(collections.monthlySalesPhone.has(formValues.newMonth.value)) {
+			if (collections.monthlySalesPhone.has(formValues.newMonth.value)) {
 				getTotalAmount(collections.monthlySalesPhone, formValues.newMonth.value);
 			} else {
 				collections.monthlySalesCamera.set(formValues.newMonth.value, "");
@@ -197,9 +202,11 @@ function addProductToMap() {
 				collections.monthlySalesLaptop.set(formValues.newMonth.value, "");
 				collections.monthlySalesTablet.set(formValues.newMonth.value, "");
 			}
+
+			getTotalAmount(collections.totalSales, "phone");
 			break;
 		case "laptop":
-			if(collections.monthlySalesLaptop.has(formValues.newMonth.value)) {
+			if (collections.monthlySalesLaptop.has(formValues.newMonth.value)) {
 				getTotalAmount(collections.monthlySalesLaptop, formValues.newMonth.value);
 			} else {
 				collections.monthlySalesCamera.set(formValues.newMonth.value, "");
@@ -207,9 +214,11 @@ function addProductToMap() {
 				collections.monthlySalesLaptop.set(formValues.newMonth.value, +formValues.newAmount.value);
 				collections.monthlySalesTablet.set(formValues.newMonth.value, "");
 			}
+
+			getTotalAmount(collections.totalSales, "laptop");
 			break;
 		case "tablet":
-			if(collections.monthlySalesTablet.has(formValues.newMonth.value)) {
+			if (collections.monthlySalesTablet.has(formValues.newMonth.value)) {
 				getTotalAmount(collections.monthlySalesTablet, formValues.newMonth.value);
 			} else {
 				collections.monthlySalesCamera.set(formValues.newMonth.value, "");
@@ -217,10 +226,11 @@ function addProductToMap() {
 				collections.monthlySalesLaptop.set(formValues.newMonth.value, "");
 				collections.monthlySalesTablet.set(formValues.newMonth.value, +formValues.newAmount.value);
 			}
+
+			getTotalAmount(collections.totalSales, "tablet");
 			break;
 	}
 }
-
 
 function checkFields() {
 	if(formValues.newMonth.value === ""
@@ -250,6 +260,10 @@ function updateBarChart() {
 	monthlySalesChart.data.datasets[3].data = [...collections.monthlySalesTablet.values()];
 }
 
+function updatePieChart() {
+	deptSalesChart.data.datasets[0].data = [...collections.totalSales.values()];
+}
+
 function addSale() {
 	try {
 		if(!checkFields() && !isNotValidAMount()) {	// Si los datos están correctos.
@@ -268,10 +282,15 @@ function addSale() {
 		// Para que aparezcan agrupados por meses.
 		monthlySalesChart.data.labels = Array.from(collections.monthlySalesMap.keys());
 
-		// Finalmente actualizamos el gráfico de barras.
+		// Actualizamos el gráfico de barras.
 		updateBarChart();
 		monthlySalesChart.update();
 		monthlySalesChart.render();
+
+		// Actualizamos el gráfico de sectores.
+		updatePieChart();
+		deptSalesChart.update();
+		deptSalesChart.render();
 
 	} catch(error) {
 		if(error.name === "FormError") alert(error.name + ": " + error.message);
