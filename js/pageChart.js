@@ -26,17 +26,17 @@ const collections =  {
 
 // Variables.
 const chartValues = {
-	deptLabels : ["Cámaras", "Móviles", "Portátiles", "Tablets"],
-	yearlyLabel : document.getElementById("yearlyTotal")
+	deptLabels : ["Cámaras", "Móviles", "Portátiles", "Tablets"],	// Labels para el gráfico de sectores.
+	yearlyLabel : document.getElementById("yearlyTotal")	// Muestra el total de ventas anuales.
 };
 
 // Botones.
 const buttons = {
-	addSaleBtn: document.getElementById("add-sale"),
-	findOver5000Btn: document.getElementById("find-over-5000"),
-	resetChartBtn: document.getElementById("reset-chart"),
-	showSalesBtn: document.getElementById("display-sales"),
-	deleteSaleBtn: document.getElementById("delete-sale"),
+	addSaleBtn: document.getElementById("add-sale"),	// Botón para añadir una venta.
+	findOver5000Btn: document.getElementById("find-over-5000"),	// Botón para encontrar ventas superiores a 5000€.
+	resetChartBtn: document.getElementById("reset-chart"),	// Botón para resetear los gráficos.
+	showSalesBtn: document.getElementById("display-sales"),	// Botón para mostrar las ventas en el select del modal deletesales.
+	deleteSaleBtn: document.getElementById("delete-sale"),	// Botón que permite eliminar una venta.
 };
 
 // Gráfico de barras.
@@ -105,6 +105,10 @@ const deptSalesChart = new Chart(canvas.deptCtx, {
 	options: {},
 });
 
+/**
+ * Función que encuentra ventas superiores a 5000.
+ * Indica la cantidad y la posición en la que está.
+ */
 function findOver5000() {
 	let position = -1;
 
@@ -122,6 +126,10 @@ function findOver5000() {
 
 // * CÁLCULO DE TOTALES.
 
+/**
+ * Calcula las ventas totales anuales. Si hay 0€
+ * muestra "Sin ventas".
+ */
 function initMonthlyTotalSales() {
 	// Reducimos todas las ventas a un único valor.
 	const total = [...collections.monthlySalesMap.values()].reduce(function(count, value) {
@@ -135,6 +143,9 @@ function initMonthlyTotalSales() {
 
 // * REINICIAR LOS GRAFICOS.
 
+/**
+ * Función que reinicia los gráficos.
+ */
 function resetMonthlySales() {
 	// Limpiamos todos los mapas.
 	collections.monthlySalesMap.clear();
@@ -160,11 +171,16 @@ function resetMonthlySales() {
 	initMonthlyTotalSales();
 }
 
+/**
+ * Función que limpia los campos del formulario.
+ */
 function cleanAddSaleForm() {
 	formValues.newMonth.value = "";
 	formValues.newAmount.value = "";
 	formValues.categories.value = "";
 }
+
+// * AÑADIR VENTAS AL GRÁFICO.
 
 /**
  * Función que suma una cantidad existente + la
@@ -179,6 +195,11 @@ function getTotalAmount(map, month) {
 	map.set(month, total);
 }
 
+/**
+ * Función que añade el producto independientemente de su categoria
+ * a su mapa correspondiente para posteriormente poder usarlo en los gráficos.
+ * Trabaja con los mapas del gráfico de barras y con el mapa del gráfico de sectores.
+ */
 function addProductToMap() {
 	// Agrega el producto según el valor que recibe al map correspondiente.
 	switch(formValues.categories.value) {	// Para cada caso tenemos que hacer lo siguiente.
@@ -240,6 +261,10 @@ function addProductToMap() {
 	}
 }
 
+/**
+ * Función que comprueba si los campos están vacíos.
+ * Lanza una excepción si alguno de ellos está vacío.
+ */
 function checkFields() {
 	if(formValues.newMonth.value === ""
 	|| formValues.newAmount.value === ""
@@ -251,6 +276,11 @@ function checkFields() {
 	}
 }
 
+/**
+ * Función que comprueba si la cantidad que se ha
+ * introducido en el formulario es válida. Si es
+ * negativa o no contiene números lanza una excepción.
+ */
 function isNotValidAMount() {
 	if(formValues.newAmount.value < 0
 	|| !/\d+/.test(formValues.newAmount.value)) {	// Comprobamos también si el campo contiene números.
@@ -261,6 +291,11 @@ function isNotValidAMount() {
 	}
 }
 
+/**
+ * Función que actualiza el gráfico de barras.
+ * Mete en un array las ventas de cada colección 
+ * de productos y lo añade al gráfico de barras.
+ */
 function updateBarChart() {
 	monthlySalesChart.data.datasets[0].data = [...collections.monthlySalesCamera.values()];
 	monthlySalesChart.data.datasets[1].data = [...collections.monthlySalesPhone.values()];
@@ -268,10 +303,21 @@ function updateBarChart() {
 	monthlySalesChart.data.datasets[3].data = [...collections.monthlySalesTablet.values()];
 }
 
+/**
+ * Función que actualiza el gráfico de sectores.
+ * Mete en un array las ventas totales del mapa que almacena las ventas totales.
+ */
 function updatePieChart() {
 	deptSalesChart.data.datasets[0].data = [...collections.totalSales.values()];
 }
 
+/**
+ * Función que permite añadir una venta.
+ * Comprueba primero que los datos del formulario son correctos
+ * después comprueba si el mes existe en el mapa principal. Si este
+ * existe añade el producto con su cantidad actualizada. Si no existe
+ * añade el mes y el producto.
+ */
 function addSale() {
 	try {
 		if(!checkFields() && !isNotValidAMount()) {	// Si los datos están correctos.
