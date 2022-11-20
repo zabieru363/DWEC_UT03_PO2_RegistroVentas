@@ -105,8 +105,6 @@ const deptSalesChart = new Chart(canvas.deptCtx, {
 	options: {},
 });
 
-// * ENCONTRAR VENTAS SUPERIORES A 5000€ CON FIND()
-
 function findOver5000() {
 	let position = -1;
 
@@ -122,7 +120,7 @@ function findOver5000() {
 	alert("Cantidad: " + quantity + " Posición: " + position);
 }
 
-// * MEJORA DEL CÁLCULO DE TOTALES.
+// * CÁLCULO DE TOTALES.
 
 function initMonthlyTotalSales() {
 	chartValues.yearlyLabel.innerHTML =
@@ -132,19 +130,28 @@ function initMonthlyTotalSales() {
 		}, 0) + "€";
 }
 
-// * REINICIAR UN ARRAY.
+// * REINICIAR LOS GRAFICOS.
 
 function resetMonthlySales() {
-	// Limpiamos el mapa.
+	// Limpiamos todos los mapas.
 	collections.monthlySalesMap.clear();
+	collections.monthlySalesCamera.clear();
+	collections.monthlySalesPhone.clear();
+	collections.monthlySalesLaptop.clear();
+	collections.monthlySalesTablet.clear();
 
-	// Limpiamos los datos del gráfico.
+	// Limpiamos los meses del gráfico.
 	monthlySalesChart.data.labels = [];
 
-	// Actualizamos el gráfico con el método update del framework.
+	// Resetear el gráfico de barras.
 	monthlySalesChart.update();
 	monthlySalesChart.reset();
 	monthlySalesChart.render();
+
+	// Resetear el gráfico de sectores.
+	deptSalesChart.update();
+	deptSalesChart.reset();
+	deptSalesChart.render();
 
 	// Volvemos a calcular los totales.
 	initMonthlyTotalSales();
@@ -336,6 +343,8 @@ function removeMonthlySale() {
 	initMonthlyTotalSales();
 	drawSelectMontlySales();
 }
+
+initMonthlyTotalSales();	// Ejecutamos esta función para que desde el inicio calcule el total de las ventas.
 
 // * EVENT LISTENERS.
 
