@@ -233,7 +233,7 @@ function checkFields() {
 	}
 }
 
-function isValidAMount() {
+function isNotValidAMount() {
 	if(formValues.newAmount.value < 0
 	|| !/\d+/.test(formValues.newAmount.value)) {	// Comprobamos también si el campo contiene números.
 		throw {
@@ -243,8 +243,38 @@ function isValidAMount() {
 	}
 }
 
+function updateBarChart() {
+	monthlySalesChart.data.datasets[0].data = [...collections.monthlySalesCamera.values()];
+	monthlySalesChart.data.datasets[1].data = [...collections.monthlySalesPhone.values()];
+	monthlySalesChart.data.datasets[2].data = [...collections.monthlySalesLaptop.values()];
+	monthlySalesChart.data.datasets[3].data = [...collections.monthlySalesTablet.values()];
+}
+
 function addSale() {
-	
+	try {
+		if(!checkFields() && !isNotValidAMount()) {	// Si los datos están correctos.
+			if(collections.monthlySalesMap.has(formValues.newMonth.value)) {	// Si el mes ya existe en el mapa principal.
+				getTotalAmount(collections.monthlySalesMap, formValues.newMonth.value);	// Hacemos la suma total del producto.
+				addProductToMap();
+			} else {	// En caso contrario.
+				collections.monthlySalesMap.set(formValues.newMonth.value, +formValues.newAmount.value);	// Tenemos que registrar el mes.
+				addProductToMap();
+			}
+		}
+
+		// Después de eso cálculamos los totales.
+		initMonthlyTotalSales();
+
+		// Para que aparezcan agrupados por meses.
+		monthlySalesChart.data.labels = Array.from(collections.monthlySalesMap.keys());
+
+		// Finalmente actualizamos el gráfico de barras.
+		updateBarChart();
+
+	} catch(error) {
+		if(error.name === "FormError") alert(error.name + ": " + error.message);
+		if(error.name === "InvalidValue") alert(error.name + ": " + error.message);
+	}
 }
 
 function drawSelectMontlySales() {
