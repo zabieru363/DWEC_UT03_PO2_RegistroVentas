@@ -1,2 +1,2 @@
-# pruebas_ventas_private
-Repositorio de pruebas
+# Registro de ventas
+Repositorio de pruebas para la práctica del registro de ventas
