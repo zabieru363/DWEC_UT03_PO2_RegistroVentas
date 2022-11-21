@@ -356,6 +356,8 @@ function addSale() {
 	}
 }
 
+// ! YO VOY A TRATAR DE HACER LA OPCIÓN C PARA ELIMINAR LAS VENTAS.
+
 function drawSelectMontlySales() {
 	// Seleccionamos el select usando id con jQuery
 	const removeSalesSelect = $("#removeSales");
@@ -373,28 +375,71 @@ function drawSelectMontlySales() {
 	}
 }
 
+function monthExists(month) {
+	if(!collections.monthlySalesMap.has(month)) {
+		throw {
+			name : "MonthError",
+			message : "No hay ventas para este mes."
+		};
+	}
+}
+
+function productHasMonth(map, month) {
+	return collections[map].has(month);
+}
+
 function removeMonthlySale() {
 	const removeSalesSelect = document.getElementById("removeSales");
 	const categories = document.forms[1].inlineRadioOptions;
 
-	// Borramos la venta de la colección.
-	switch(categories.value) {
-		
+	try {
+		if(!monthExists(removeSalesSelect.value)) {
+			// Borramos la venta de la colección.
+			switch(categories.value) {
+				case "camera":
+					if(productHasMonth("monthlySalesCamera", removeSalesSelect.value)) {
+						collections.monthlySalesCamera.delete(removeSalesSelect.value);
+						collections.totalSales.delete("camera");
+					}
+					break;
+				case "phone":
+					if(productHasMonth("monthlySalesPhone", removeSalesSelect.value)) {
+						collections.monthlySalesPhone.delete(removeSalesSelect.value);
+						collections.totalSales.delete("phone");
+					}
+					break;
+				case "laptop":
+					if(productHasMonth("monthlySalesLaptop", removeSalesSelect.value)) {
+						collections.monthlySalesLaptop.delete(removeSalesSelect.value);
+						collections.totalSales.delete("laptop");
+					}
+					break;
+				case "tablet":
+					if(productHasMonth("monthlySalesTablet", removeSalesSelect.value)) {
+						collections.monthlySalesTablet.delete(removeSalesSelect.value);
+						collections.totalSales.delete("tablet");
+					}
+					break;
+			}
+		}
+	} catch(error) {
+		alert(error.name + " " + error.message);
 	}
-	collections.monthlySalesMap.delete(removeSales.value);
 
 	// Actualizamos colección en el gráfico
+	updateBarChart();
+	updatePieChart();
 
-	// Sus valores.
-	monthlySalesChart.data.datasets[0].data = Array.from(collections.monthlySalesMap.values());
-	// Y sus claves.
-	monthlySalesChart.data.labels = Array.from(collections.monthlySalesMap.keys());
-	// Y actualizamos el gráfico.
+	// Y actualizamos el gráfico de barras.
 	monthlySalesChart.update();
+	monthlySalesChart.render();
+
+	// Actualizamos el gráfico de sectores.
+	deptSalesChart.update();
+	deptSalesChart.render();
 
 	// Actualizasmos la vista
 	initMonthlyTotalSales();
-	drawSelectMontlySales();
 }
 
 initMonthlyTotalSales();	// Ejecutamos esta función para que desde el inicio calcule el total de las ventas.
