@@ -11,7 +11,6 @@ const formValues = {
 	newAmount : document.getElementById('itemAmount'),	// Nueva cantidad.
 	newMonth : document.getElementById('monthId'),	// Nuevo mes.
 	categories : document.forms[0].inlineRadioOptions,	// RadioButtons con las categorias de producto.
-	months : ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]	// Array con los meses para cargar en el select de eliminar ventas.
 };
 
 // Colecciones para mostrar en gráficos.
@@ -29,7 +28,23 @@ const collections =  {
 const chartValues = {
 	deptLabels : ["Cámaras", "Móviles", "Portátiles", "Tablets"],	// Labels para el gráfico de sectores.
 	yearlyLabel : document.getElementById("yearlyTotal"),	// Muestra el total de ventas anuales.
-	monthsKey : ["2022-01", "2022-02", "2022-03", "2022-04", "2022-05", "2022-06", "2022-07", "2022-08", "2022-09", "2022-10", "2022-11", "2022-12"]
+};
+
+/* Objeto literal que se puede utilizar para obtener la clave de un mes en formato string.
+Lo utilizo en la función drawSelectMontlySales para cargar los meses que tengan ventas. */
+const months = {
+    "2022-01" : "Enero",
+    "2022-02" : "Febrero",
+    "2022-03" : "Marzo",
+    "2022-04" : "Abril",
+    "2022-05" : "Mayo",
+    "2022-06" : "Junio",
+    "2022-07" : "Julio",
+    "2022-08" : "Agosto",
+    "2022-09" : "Septiembre",
+    "2022-10" : "Octubre",
+    "2022-11" : "Noviembre",
+    "2022-12" : "Diciembre",
 };
 
 // Botones.
@@ -369,14 +384,12 @@ function drawSelectMontlySales() {
 	// Eliminamos options del select.
 	removeSalesSelect.empty();
 
-	let index = 0;	// Necesitamos esta variable para ir asignando las claves de los meses a los options del select.
-
-	for(const month of formValues.months) {
+	for(const month of [...collections.monthlySalesMap.keys()]) {
 		const option = $("<option>")
-			.val(chartValues.monthsKey[index])	// El valor serán las claves de los meses que se guardan en los mapas.
-			.text(month);	// Y el texto será el nombre del mes.
-		removeSalesSelect.append(option);	// Añadimos los options al select.
-		index++;
+			.val(month)
+			.text(months[month]);	// Accedo con la notación corchete.
+		
+			removeSalesSelect.append(option);
 	}
 }
 
