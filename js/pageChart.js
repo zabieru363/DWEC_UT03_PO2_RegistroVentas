@@ -358,6 +358,11 @@ function addSale() {
 
 // ! YO VOY A TRATAR DE HACER LA OPCIÓN C PARA ELIMINAR LAS VENTAS.
 
+/**
+ * Función que carga los meses en el select del modal
+ * de eliminar ventas. El valor del option es el value
+ * que nos da el campo month y el texto el nombre del mes.
+ */
 function drawSelectMontlySales() {
 	// Seleccionamos el select usando id con jQuery
 	const removeSalesSelect = $("#removeSales");
@@ -375,6 +380,10 @@ function drawSelectMontlySales() {
 	}
 }
 
+/**
+ * Función que comprueba si un mes existe dentro del mapa principal.
+ * @param {*} month El mes a encontrar.
+ */
 function monthExists(month) {
 	if(!collections.monthlySalesMap.has(month)) {
 		throw {
@@ -384,10 +393,20 @@ function monthExists(month) {
 	}
 }
 
+/**
+ * Función que comprueba si una venta tiene el mes que se busca.
+ * @param {*} map El mapa de la categoria de productos.
+ * @param {*} month El mes a evaluar.
+ * @returns Si hay una venta en ese mes o no.
+ */
 function productHasMonth(map, month) {
 	return collections[map].has(month);
 }
 
+/**
+ * Elimina una venta de los mapas. Todavía no funciona
+ * correctamente de manera visual en el gráfico de sectores.
+ */
 function removeMonthlySale() {
 	const removeSalesSelect = document.getElementById("removeSales");
 	const categories = document.forms[1].inlineRadioOptions;
