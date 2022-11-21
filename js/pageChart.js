@@ -171,6 +171,12 @@ function resetMonthlySales() {
 	collections.monthlySalesLaptop.clear();
 	collections.monthlySalesTablet.clear();
 
+	// Limpiamos las claves del mapa del gráfico de sectores.
+	collections.totalSales.set("camera", 0);
+	collections.totalSales.set("phone", 0);
+	collections.totalSales.set("laptop", 0);
+	collections.totalSales.set("tablet", 0);
+
 	// Limpiamos los meses del gráfico.
 	monthlySalesChart.data.labels = [];
 
@@ -393,27 +399,9 @@ function drawSelectMontlySales() {
 	}
 }
 
-/**
- * Función que comprueba si un mes existe dentro del mapa principal.
- * @param {*} month El mes a encontrar.
- */
-function monthExists(month) {
-	if(!collections.monthlySalesMap.has(month)) {
-		throw {
-			name : "MonthError",
-			message : "No hay ventas para este mes."
-		};
-	}
-}
+function removeAmount(map, month) {
+	let total = collections[map].get(month);
 
-/**
- * Función que comprueba si una venta tiene el mes que se busca.
- * @param {*} map El mapa de la categoria de productos.
- * @param {*} month El mes a evaluar.
- * @returns Si hay una venta en ese mes o no.
- */
-function productHasMonth(map, month) {
-	return collections[map].has(month);
 }
 
 /**
@@ -424,38 +412,28 @@ function removeMonthlySale() {
 	const removeSalesSelect = document.getElementById("removeSales");
 	const categories = document.forms[1].inlineRadioOptions;
 
-	try {
-		if(!monthExists(removeSalesSelect.value)) {
-			// Borramos la venta de la colección.
-			switch(categories.value) {
-				case "camera":
-					if(productHasMonth("monthlySalesCamera", removeSalesSelect.value)) {
-						collections.monthlySalesCamera.delete(removeSalesSelect.value);
-						collections.totalSales.delete("camera");
-					}
-					break;
-				case "phone":
-					if(productHasMonth("monthlySalesPhone", removeSalesSelect.value)) {
-						collections.monthlySalesPhone.delete(removeSalesSelect.value);
-						collections.totalSales.delete("phone");
-					}
-					break;
-				case "laptop":
-					if(productHasMonth("monthlySalesLaptop", removeSalesSelect.value)) {
-						collections.monthlySalesLaptop.delete(removeSalesSelect.value);
-						collections.totalSales.delete("laptop");
-					}
-					break;
-				case "tablet":
-					if(productHasMonth("monthlySalesTablet", removeSalesSelect.value)) {
-						collections.monthlySalesTablet.delete(removeSalesSelect.value);
-						collections.totalSales.delete("tablet");
-					}
-					break;
+	// Borramos la venta de la colección.
+	switch(categories.value) {
+		case "camera":
+			if(collections.monthlySalesCamera.has(removeSalesSelect.value)) {
+				collections.monthlySalesCamera.delete(removeSalesSelect.value);
 			}
-		}
-	} catch(error) {
-		alert(error.name + " " + error.message);
+			break;
+		case "phone":
+			if(collections.monthlySalesPhone.has(removeSalesSelect.value)) {
+				collections.monthlySalesPhone.delete(removeSalesSelect.value);
+			}
+			break;
+		case "laptop":
+			if(collections.monthlySalesLaptop.has(removeSalesSelect.value)) {
+				collections.monthlySalesLaptop.delete(removeSalesSelect.value);
+			}
+			break;
+		case "tablet":
+			if(collections.monthlySalesTablet.has(removeSalesSelect.value)) {
+				collections.monthlySalesTablet.delete(removeSalesSelect.value);
+			}
+			break;
 	}
 
 	// Actualizamos colección en el gráfico
