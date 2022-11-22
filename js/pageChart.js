@@ -149,7 +149,7 @@ function findOver5000() {
  */
 function initMonthlyTotalSales() {
 	// Reducimos todas las ventas a un único valor.
-	const total = [...collections.monthlySalesMap.values()].reduce(function(count, value) {
+	const total = [...collections.totalSales.values()].reduce(function(count, value) {
 		return count + value;
 	}, 0);
 
@@ -399,39 +399,63 @@ function drawSelectMontlySales() {
 	}
 }
 
-function removeAmount(map, month) {
-	let total = collections[map].get(month);
-
+/**
+ * Función que devuelve el valor de la venta de un mes.
+ * @param {*} map El mapa del cuál se quiere obtener la venta.
+ * @param {*} month La clave del valor que se quiere obtener.
+ * @returns El valor de la venta o total de ventas del mapa en especifico.
+ */
+function getAmount(map, key) {
+	return collections[map].get(key);
 }
 
 /**
- * Elimina una venta de los mapas. Todavía no funciona
- * correctamente de manera visual en el gráfico de sectores.
+ * Elimina las ventas de un producto para un mes en especifico
+ * de los mapas. Yo implementé la opción c.
  */
 function removeMonthlySale() {
 	const removeSalesSelect = document.getElementById("removeSales");
 	const categories = document.forms[1].inlineRadioOptions;
+	let amount = 0;	// Esta variable la uso para guardar el valor de la venta del producto.
+	let totalProductAmount = 0;	// Sirve para guardar el total de ventas de una categoría.
+	let newAmount = 0;	// Sirve para actualizar la cantidad
 
 	// Borramos la venta de la colección.
 	switch(categories.value) {
 		case "camera":
 			if(collections.monthlySalesCamera.has(removeSalesSelect.value)) {
-				collections.monthlySalesCamera.delete(removeSalesSelect.value);
+				amount = getAmount("monthlySalesCamera", removeSalesSelect.value);	// Cogemos el valor de la venta del producto en ese mes.
+				totalProductAmount = getAmount("totalSales", "camera");	// Cogemos el valor de las ventas totales de ese producto.
+				newAmount = totalProductAmount - amount;	// Establecemos el nuevo total de ventas de ese producto.
+				collections.monthlySalesCamera.delete(removeSalesSelect.value);	// Eliminamos la venta del producto en ese mes en especifico.
+				collections.totalSales.set("camera", newAmount);	// Le asignamos la nueva cantidad a la categoría de producto correspondiente.
 			}
 			break;
 		case "phone":
 			if(collections.monthlySalesPhone.has(removeSalesSelect.value)) {
+				amount = getAmount("monthlySalesPhone", removeSalesSelect.value);
+				totalProductAmount = getAmount("totalSales", "phone");
+				newAmount = totalProductAmount - amount;
 				collections.monthlySalesPhone.delete(removeSalesSelect.value);
+				collections.totalSales.set("phone", newAmount);
 			}
 			break;
 		case "laptop":
 			if(collections.monthlySalesLaptop.has(removeSalesSelect.value)) {
+				amount = getAmount("monthlySalesLaptop", removeSalesSelect.value);
+				totalProductAmount = getAmount("totalSales", "laptop");
+				newAmount = totalProductAmount - amount;
 				collections.monthlySalesLaptop.delete(removeSalesSelect.value);
+				collections.totalSales.set("laptop", newAmount);
 			}
 			break;
 		case "tablet":
 			if(collections.monthlySalesTablet.has(removeSalesSelect.value)) {
+				amount = getAmount("monthlySalesTablet", removeSalesSelect.value);
+				totalProductAmount = getAmount("totalSales", "tablet");
+				newAmount = totalProductAmount - amount;
 				collections.monthlySalesTablet.delete(removeSalesSelect.value);
+				collections.totalSales.set("tablet", newAmount);
 			}
 			break;
 	}
@@ -450,6 +474,7 @@ function removeMonthlySale() {
 
 	// Actualizasmos la vista
 	initMonthlyTotalSales();
+	drawSelectMontlySales();
 }
 
 initMonthlyTotalSales();	// Ejecutamos esta función para que desde el inicio calcule el total de las ventas.
