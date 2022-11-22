@@ -410,6 +410,19 @@ function getAmount(map, key) {
 }
 
 /**
+ * Función que comprueba si un producto tiene ventas
+ * @param {*} map El mapa de ventas de un producto a comprobar.
+ */
+function productHasSales(map) {
+	if(collections[map].size === 0) {
+		throw {
+			mame : "ProductError",
+			message : "El producto no tiene ventas en este mes"
+		};
+	}
+}
+
+/**
  * Elimina las ventas de un producto para un mes en especifico
  * de los mapas. Yo implementé la opción c.
  */
